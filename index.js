@@ -40,7 +40,7 @@ app.get('/info', (req, res) => {
     res.send('puhelinluettelossa ' + ppl.length + ' henkilön tiedot</br></br>' + Date(Date.now()).toString())
 })
 
-app.get('/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = ppl.find(person => person.id === id)
 
@@ -51,7 +51,7 @@ app.get('/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id);
     ppl = ppl.filter(person => person.id !== id);
 
@@ -92,7 +92,7 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
