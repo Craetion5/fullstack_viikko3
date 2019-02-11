@@ -1,8 +1,12 @@
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+}
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -33,7 +37,10 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-    res.json(ppl)
+    Person.find({}).then(notes => {
+        res.json(notes)
+    })
+    //res.json(ppl)
 })
 
 app.get('/info', (req, res) => {
@@ -52,10 +59,15 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id);
-    ppl = ppl.filter(person => person.id !== id);
+    //const id = Number(request.params.id);
+    //ppl = ppl.filter(person => person.id !== id);
 
-    response.status(204).end();
+    //response.status(204).end();
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+    //.catch(error => next(error))
 });
 
 app.post('/api/persons', (request, response) => {
@@ -81,15 +93,25 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({
             error: 'name must be unique'
         })
+
     }
 
-    const person = {
-        id: getRandomInt(99999),
+    const person = new Person({
         name: body.name,
         number: body.number
-    }
+    })
+
+    person.save().then(savedPerson => {
+        response.json(savedPerson.toJSON())
+    })
+
+    //const person = {
+    //    id: getRandomInt(99999),
+    //    name: body.name,
+    //    number: body.number
+    //}
     ppl = ppl.concat(person)
-    response.json(person)
+    //response.json(person)
 })
 
 const PORT = process.env.PORT || 3001
